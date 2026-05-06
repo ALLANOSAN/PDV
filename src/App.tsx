@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import SalesPage from './pages/dashboard/SalesPage';
@@ -51,10 +50,6 @@ function App() {
           <Route 
             path="/login" 
             element={session ? <Navigate to="/dashboard" /> : <LoginPage />} 
-          />
-          <Route 
-            path="/register" 
-            element={session ? <Navigate to="/dashboard" /> : <RegisterPage />} 
           />
           
           <Route 
