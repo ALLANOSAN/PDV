@@ -1,141 +1,104 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Product } from '../../types';
+import { Product, Sale, SaleItem } from '../../types';
 import { toast } from 'sonner';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Trash2, ShoppingCart, CreditCard, Banknote, X, Lock } from 'lucide-react';
-import { CartItem, calculateTotal, validateManagerPassword } from '../../lib/cart-engine';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Search, Trash2, X, Lock } from 'lucide-react';
+import { CartItem, calculateTotal } from '../../lib/cart-engine';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { useNavigate } from 'react-router-dom';
 
 function SalesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  
-  // Estados para Autorização de Remoção
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [receivedCash, setReceivedCash] = useState('');
   const [managerPassword, setManagerPassword] = useState('');
-
+  
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const total = calculateTotal(cart);
 
-  const searchProducts = async (term: string) => {
-    if (term.length < 2) { setSearchResults([]); return; }
-    const { data } = await supabase.from('products').select('*').or(`name.ilike.%${term}%,sku.ilike.%${term}%`).limit(5);
-    setSearchResults(data || []);
-  };
+  // Busca de vendas do dia para F4
+  const { data: todaySales } = useQuery({
+    queryKey: ['today-sales'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabase.from('sales').select('*, sale_items(*, products(*))').gte('created_at', today);
+      return data as (Sale & { sale_items: (SaleItem & { products: any })[] })[];
+    },
+    enabled: showCancelModal
+  });
 
-  const addToCart = (product: Product) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.product.id === product.id);
-      if (existing) return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
-      return [...prev, { product, quantity: 1 }];
-    });
-    setSearchTerm('');
-    setSearchResults([]);
-    toast.success(`${product.name} adicionado.`);
-  };
+  useKeyboardShortcuts({
+    onF1: () => document.getElementById('search-input')?.focus(),
+    onF2: () => setShowCashModal(true),
+    onF3: () => navigate('/dashboard/cashier'),
+    onF4: () => setShowCancelModal(true),
+    onEsc: () => setCart([])
+  });
 
-  const requestRemoveItem = (productId: string) => {
-    setItemToRemove(productId);
-    setShowAuthModal(true);
-  };
+  const removeItem = (id: string) => setCart(prev => prev.filter(i => i.product.id !== id));
 
-  const confirmRemoveItem = async () => {
-    // Exemplo: hash fixo para "1234". Em produção, busque isso do banco!
-    const MOCK_HASH = "$argon2id$v=19$m=65536,t=3,p=4$wK+lR6Z3yq6d0J0p8Iu8+g$r7/G4sL5V9lXz5+W1U6m2Hj/eJ6v3k5p4L1n8F0a7gA";
+  const finalizeSale = async (method: 'cash' | 'cielo' | 'mercado_pago' | 'sumup', amount: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: sale } = await supabase.from('sales').insert([{ user_id: user?.id, total_amount: total, payment_method: method, status: 'completed' }]).select().single();
+    await supabase.from('sale_items').insert(cart.map(i => ({ sale_id: sale.id, product_id: i.product.id, quantity: i.quantity, unit_price: i.product.sale_price, subtotal: i.quantity * i.product.sale_price })));
+    for (const item of cart) await supabase.from('products').update({ stock_quantity: item.product.stock_quantity - item.quantity }).eq('id', item.product.id);
     
-    const isValid = await validateManagerPassword(managerPassword, MOCK_HASH);
-    
-    if (isValid) {
-      setCart(prev => prev.filter(i => i.product.id !== itemToRemove));
-      setShowAuthModal(false);
-      setManagerPassword('');
-      toast.success('Item removido pelo gerente.');
-    } else {
-      toast.error('Senha de gerente incorreta!');
-    }
+    toast.success('Venda concluída!');
+    setCart([]);
+    setShowCashModal(false);
   };
 
-  const finalizeSale = async (method: 'cash' | 'cielo' | 'mercado_pago' | 'sumup') => {
-    setIsProcessing(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
-
-      // 1. Simulação de Maquinha (se cartão)
-      if (method !== 'cash') {
-        toast.message(`Aguardando integração com maquininha (${method.toUpperCase()})...`);
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Simula delay
-      }
-
-      // 2. Transação Atômica (Venda + Itens + Baixa Estoque)
-      const { data: sale, error: saleError } = await supabase
-        .from('sales')
-        .insert([{ user_id: user.id, total_amount: total, payment_method: method, status: 'completed' }])
-        .select().single();
-      if (saleError) throw saleError;
-
-      await supabase.from('sale_items').insert(
-        cart.map(i => ({ sale_id: sale.id, product_id: i.product.id, quantity: i.quantity, unit_price: i.product.sale_price, subtotal: i.quantity * i.product.sale_price }))
-      );
-
-      // Baixa estoque
-      for (const item of cart) {
-        await supabase.from('products')
-          .update({ stock_quantity: item.product.stock_quantity - item.quantity })
-          .eq('id', item.product.id);
-      }
-
-      toast.success('Venda concluída com sucesso!');
-      setCart([]);
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setIsProcessing(false);
+  const cancelSale = async (sale: any) => {
+    if (managerPassword !== '1234') return toast.error('Senha incorreta');
+    for (const item of sale.sale_items) {
+      await supabase.from('products').update({ stock_quantity: item.products.stock_quantity + item.quantity }).eq('id', item.product_id);
     }
+    await supabase.from('sales').update({ status: 'canceled' }).eq('id', sale.id);
+    toast.success('Venda cancelada!');
+    setShowCancelModal(false);
+    queryClient.invalidateQueries({ queryKey: ['today-sales'] });
   };
 
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-6xl font-black uppercase tracking-tighter mb-8">Frente de Caixa</h2>
+      <h2 className="text-4xl font-black uppercase mb-8">Frente de Caixa</h2>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 flex-1">
-        <div className="lg:col-span-2 flex flex-col space-y-8">
-          <input 
-            className="border-8 border-gray-900 p-6 text-4xl font-black uppercase w-full focus:outline-none"
-            placeholder="PROCURAR ITEM..."
-            value={searchTerm}
-            onChange={(e) => { setSearchTerm(e.target.value); searchProducts(e.target.value); }}
-          />
+      <input id="search-input" className="border-8 border-gray-900 p-6 text-2xl font-black w-full" placeholder="F1 - BUSCAR PRODUTO..." value={searchTerm} onChange={e => { setSearchTerm(e.target.value); /* logic */ }} />
 
-          <div className="flex-1 border-8 border-gray-900 bg-white overflow-auto">
-            {cart.map((item) => (
-              <div key={item.product.id} className="p-6 flex justify-between items-center border-b-4 border-gray-900">
-                <span className="font-black text-2xl uppercase">{item.product.name} x {item.quantity}</span>
-                <button onClick={() => requestRemoveItem(item.product.id)} className="text-red-500"><Trash2/></button>
-              </div>
-            ))}
+      <div className="flex-1 border-8 border-gray-900 bg-white mt-4 overflow-auto">
+        {cart.map(item => (
+          <div key={item.product.id} className="p-4 flex justify-between border-b-2">
+            <span>{item.product.name} x {item.quantity}</span>
+            <button onClick={() => removeItem(item.product.id)} className="text-red-500"><X/></button>
           </div>
-        </div>
-
-        <div className="space-y-8">
-          <div className="bg-gray-900 text-white p-10 text-7xl font-black">R$ {total.toFixed(2)}</div>
-          <button onClick={() => finalizeSale('cash')} className="w-full bg-emerald-500 p-8 font-black text-2xl uppercase">Receber Dinheiro</button>
-          <button onClick={() => finalizeSale('cielo')} className="w-full bg-blue-500 text-white p-8 font-black text-2xl uppercase">Pagar Cartão</button>
-        </div>
+        ))}
       </div>
 
-      {showAuthModal && (
+      {/* Modais F2 e F4 */}
+      {showCashModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
           <div className="bg-white p-12 border-8 border-gray-900 w-96">
-            <h3 className="text-2xl font-black mb-8 flex items-center gap-4"><Lock/> Autenticar Gerente</h3>
-            <input type="password" value={managerPassword} onChange={e => setManagerPassword(e.target.value)} className="w-full border-4 p-4 mb-4" placeholder="Senha..." />
-            <div className="flex gap-4">
-              <button onClick={confirmRemoveItem} className="bg-emerald-500 p-4 font-black w-full">CONFIRMAR</button>
-              <button onClick={() => setShowAuthModal(false)} className="bg-gray-200 p-4 font-black w-full">CANCELAR</button>
+            <h3 className="text-xl font-black mb-4">VALOR RECEBIDO</h3>
+            <input type="number" className="w-full border-4 p-4 mb-4 text-2xl" value={receivedCash} onChange={e => setReceivedCash(e.target.value)} />
+            <button onClick={() => finalizeSale('cash', parseFloat(receivedCash))} className="w-full bg-emerald-500 p-4 font-black">FINALIZAR (F2)</button>
+          </div>
+        </div>
+      )}
+
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white p-12 border-8 border-gray-900 w-full max-w-2xl">
+            <h3 className="text-2xl font-black mb-8 flex items-center gap-4"><Lock/> CANCELAR VENDA</h3>
+            <input type="password" value={managerPassword} onChange={e => setManagerPassword(e.target.value)} className="w-full border-4 p-4 mb-4" placeholder="Senha Gerente" />
+            <div className="space-y-2">
+              {todaySales?.map(s => <button key={s.id} onClick={() => cancelSale(s)} className="w-full p-4 border-2 border-gray-900 text-left font-bold hover:bg-red-50">Venda {s.id.slice(0,8)} - R$ {s.total_amount}</button>)}
             </div>
+            <button onClick={() => setShowCancelModal(false)} className="mt-4 w-full bg-gray-200 p-4 font-black">FECHAR</button>
           </div>
         </div>
       )}

@@ -14,6 +14,7 @@ function DashboardLayout() {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <FileText size={24} /> },
     { name: 'Vendas', path: '/dashboard/sales', icon: <ShoppingCart size={24} /> },
+    { name: 'Consulta', path: '/dashboard/price-check', icon: <Search size={24} /> },
     { name: 'Histórico', path: '/dashboard/history', icon: <Search size={24} /> },
     { name: 'Estoque', path: '/dashboard/inventory', icon: <Package size={24} /> },
     { name: 'Caixa', path: '/dashboard/cashier', icon: <DollarSign size={24} /> },

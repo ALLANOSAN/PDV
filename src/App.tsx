@@ -5,6 +5,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import SalesPage from './pages/dashboard/SalesPage';
+import PriceCheckPage from './pages/dashboard/PriceCheckPage';
 import SalesHistoryPage from './pages/dashboard/SalesHistoryPage';
 import InventoryPage from './pages/dashboard/InventoryPage';
 import CashierPage from './pages/dashboard/CashierPage';
@@ -62,6 +63,7 @@ function App() {
           >
             <Route index element={<DashboardPage />} />
             <Route path="sales" element={<SalesPage />} />
+            <Route path="price-check" element={<PriceCheckPage />} />
             <Route path="history" element={<SalesHistoryPage />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="cashier" element={<CashierPage />} />
