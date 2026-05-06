@@ -58,7 +58,6 @@ function LandingPage() {
 
       <footer className="w-full max-w-7xl py-12 border-t-2 border-gray-100 mt-20 flex justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-400">
         <p>© 2026 PDV LOCAL PRO - SISTEMA INDUSTRIAL</p>
-        <p>CACHYOS LINUX SYSTEM</p>
       </footer>
     </div>
   )
