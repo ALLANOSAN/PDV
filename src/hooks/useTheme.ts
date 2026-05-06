@@ -13,5 +13,5 @@ export const useTheme = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  return { theme, toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light') };
+  return { theme, toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light'), Moon, Sun };
 };

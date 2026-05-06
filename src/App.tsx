@@ -8,6 +8,7 @@ import PriceCheckPage from './pages/dashboard/PriceCheckPage';
 import SalesHistoryPage from './pages/dashboard/SalesHistoryPage';
 import InventoryPage from './pages/dashboard/InventoryPage';
 import CashierPage from './pages/dashboard/CashierPage';
+import PaymentsPage from './pages/dashboard/PaymentsPage';
 import LandingPage from './pages/LandingPage';
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
@@ -62,6 +63,7 @@ function App() {
             <Route path="history" element={<SalesHistoryPage />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="cashier" element={<CashierPage />} />
+            <Route path="payments" element={<PaymentsPage />} />
           </Route>
         </Routes>
       </Router>
