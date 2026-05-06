@@ -61,7 +61,7 @@ function LoginPage() {
         </form>
 
         <p className="text-center text-sm text-slate-600 mt-6">
-          Não tem conta? <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Cadastrar-se</Link>
+          PDV Pro - Acesso Restrito
         </p>
       </div>
     </div>
