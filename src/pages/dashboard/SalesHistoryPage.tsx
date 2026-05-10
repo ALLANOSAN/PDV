@@ -163,6 +163,5 @@ function SalesHistoryPage() {
     </div>
   );
 }
-}
 
 export default SalesHistoryPage;

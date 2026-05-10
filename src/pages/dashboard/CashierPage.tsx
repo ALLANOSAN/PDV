@@ -188,6 +188,5 @@ function CashierPage() {
     </div>
   );
 }
-}
 
 export default CashierPage;
