@@ -5,37 +5,64 @@ import { toast } from 'sonner';
 export const OfflineSync = () => {
   useEffect(() => {
     const sync = async () => {
-      const pendingKeys = Object.keys(localStorage).filter(k => k.startsWith('pending_sale_'));
-      if (pendingKeys.length === 0) return;
+      // 1. Sincronizar Vendas
+      const pendingSales = JSON.parse(localStorage.getItem('pending_sales') || '[]');
+      if (pendingSales.length > 0) {
+        toast.info(`Sincronizando ${pendingSales.length} vendas pendentes...`);
+        const remainingSales = [];
 
-      toast.info('Sincronizando vendas pendentes...');
-      
-      for (const key of pendingKeys) {
-        const { saleData, cart } = JSON.parse(localStorage.getItem(key)!);
-        try {
-          const { data: sale, error } = await supabase.from('sales').insert([saleData]).select().single();
-          if (error) throw error;
-          
-          await supabase.from('sale_items').insert(
-            cart.map((i: any) => ({ 
-              sale_id: sale.id, 
-              product_id: i.product.id, 
-              quantity: i.quantity, 
-              unit_price: i.product.sale_price, 
-              subtotal: i.quantity * i.product.sale_price 
-            }))
-          );
-          
-          localStorage.removeItem(key);
-        } catch (e) {
-          console.error('Falha ao sincronizar venda:', e);
+        for (const sale of pendingSales) {
+          try {
+            const { error } = await supabase.rpc('process_sale_with_stock', {
+              p_user_id: sale.user_id,
+              p_total_amount: sale.total_amount,
+              p_payment_method: sale.payment_method,
+              p_items: sale.items
+            });
+            if (error) throw error;
+          } catch (e) {
+            remainingSales.push(sale);
+            console.error('Falha ao sincronizar venda:', e);
+          }
         }
+        
+        localStorage.setItem('pending_sales', JSON.stringify(remainingSales));
+        if (remainingSales.length === 0) toast.success('Vendas sincronizadas!');
       }
-      toast.success('Todas as vendas foram sincronizadas!');
+
+      // 2. Sincronizar Produtos (Estoque)
+      const pendingProducts = JSON.parse(localStorage.getItem('pending_products') || '[]');
+      if (pendingProducts.length > 0) {
+        toast.info(`Sincronizando ${pendingProducts.length} alterações de estoque...`);
+        const remainingProducts = [];
+
+        for (const item of pendingProducts) {
+          try {
+            if (item.action === 'create') {
+              const { error } = await supabase.from('products').insert([item.data]);
+              if (error) throw error;
+            } else if (item.action === 'update') {
+              const { error } = await supabase.from('products').update(item.data).eq('id', item.id);
+              if (error) throw error;
+            } else if (item.action === 'delete') {
+              const { error } = await supabase.from('products').delete().eq('id', item.id);
+              if (error) throw error;
+            }
+          } catch (e) {
+            remainingProducts.push(item);
+          }
+        }
+        localStorage.setItem('pending_products', JSON.stringify(remainingProducts));
+        if (remainingProducts.length === 0) toast.success('Estoque sincronizado!');
+      }
     };
 
     window.addEventListener('online', sync);
+    // Tenta sincronizar ao carregar também
+    if (navigator.onLine) sync();
+    
     return () => window.removeEventListener('online', sync);
   }, []);
+
   return null;
 };

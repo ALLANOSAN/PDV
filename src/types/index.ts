@@ -15,7 +15,7 @@ export interface Sale {
   id: string;
   user_id: string;
   total_amount: number;
-  payment_method: 'cash' | 'cielo' | 'mercado_pago' | 'sumup';
+  payment_method: 'cash' | 'card';
   status: 'completed' | 'pending' | 'canceled';
   created_at: string;
 }
@@ -30,6 +30,11 @@ export interface SaleItem {
   created_at: string;
   // Join fields
   product?: Product;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
 }
 
 export interface CashOperation {

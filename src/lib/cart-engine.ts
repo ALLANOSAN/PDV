@@ -8,7 +8,8 @@ export const calculateChange = (total: number, received: number): number => {
   return Math.max(0, received - total);
 };
 
-// Verificação simples para rodar no navegador sem dependências de servidor
+// Verificação usando variável de ambiente
 export const validateManagerPassword = (password: string): boolean => {
-  return password === "1234";
+  const managerPass = import.meta.env.VITE_MANAGER_PASSWORD || "1234";
+  return password === managerPass;
 };

@@ -39,3 +39,7 @@ pnpm-debug.log*
 .agent
 *.history
 .history/supabase
+graphify-out
+.gemini
+AGENTS.md
+GEMINI.md

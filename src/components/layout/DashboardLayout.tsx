@@ -20,56 +20,67 @@ function DashboardLayout() {
     { name: 'Histórico', path: '/dashboard/history', icon: <FileText size={20} /> },
     { name: 'Estoque', path: '/dashboard/inventory', icon: <Package size={20} /> },
     { name: 'Caixa', path: '/dashboard/cashier', icon: <DollarSign size={20} /> },
-    { name: 'Máquinas', path: '/dashboard/payments', icon: <CreditCard size={20} /> },
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-900">
-      <aside className="w-64 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex flex-col">
-        <div className="p-6 border-b dark:border-slate-700">
-          <h2 className="text-lg font-bold text-indigo-600">PDV LOCAL PRO</h2>
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 transition-colors">
+      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm">
+        <div className="p-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
+              <ShoppingCart size={24} weight="fill" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tighter uppercase leading-none">PDV PRO</h2>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Local Edition</span>
+            </div>
+          </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 px-4 space-y-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center p-3 gap-3 rounded-lg transition-colors ${
+                className={`flex items-center p-3.5 gap-3.5 rounded-2xl transition-all group ${
                   isActive 
-                    ? 'bg-indigo-50 text-indigo-700 font-semibold' 
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-none' 
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-indigo-600'
                 }`}
               >
-                {item.icon}
-                <span className="text-sm font-medium">{item.name}</span>
+                <span className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600'} transition-colors`}>
+                  {item.icon}
+                </span>
+                <span className="text-sm font-bold tracking-tight">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t dark:border-slate-700">
+        <div className="p-6 space-y-2 border-t border-slate-100 dark:border-slate-800">
           <button 
             onClick={toggleTheme}
-            className="w-full flex items-center gap-3 p-3 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            className="w-full flex items-center gap-3.5 p-3.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl transition-all"
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-            <span className="text-sm font-medium">Modo {theme === 'light' ? 'Escuro' : 'Claro'}</span>
+            <span className="text-sm font-bold">Modo {theme === 'light' ? 'Escuro' : 'Claro'}</span>
           </button>
           <button
             onClick={handleLogout}
-            className="w-full mt-2 p-3 flex items-center gap-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="w-full p-3.5 flex items-center gap-3.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl transition-all"
           >
             <LogOut size={20} />
-            <span className="text-sm font-medium">Sair</span>
+            <span className="text-sm font-bold">Encerrar Sessão</span>
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto p-8 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
-        <Outlet />
+      <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950 transition-colors">
+        <div className="h-full">
+            <Outlet />
+        </div>
       </main>
     </div>
   );
