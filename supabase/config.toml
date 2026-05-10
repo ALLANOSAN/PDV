@@ -11,8 +11,8 @@ port = 54322
 shadow_port = 54320
 
 [auth]
-site_url = "http://localhost:5173"
-additional_redirect_urls = ["http://localhost:5173/**"]
+site_url = "https://pdv-tico.vercel.app"
+additional_redirect_urls = ["https://pdv-tico.vercel.app/**"]
 jwt_expiry = 3600
 enable_signup = true
 
