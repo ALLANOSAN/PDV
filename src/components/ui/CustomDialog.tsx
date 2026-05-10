@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
 
 type DialogType = 'confirm' | 'alert' | 'prompt';
 

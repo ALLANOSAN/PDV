@@ -58,7 +58,7 @@ function InventoryPage() {
             .insert([{ ...data, user_id: user.id }]);
           if (error) throw error;
         }
-      } catch (err) {
+      } catch {
         // Fallback Offline
         const action = editingProduct ? 'update' : 'create';
         const pendingItem = {
@@ -92,7 +92,7 @@ function InventoryPage() {
       try {
         const { error } = await supabase.from('products').delete().eq('id', id);
         if (error) throw error;
-      } catch (err) {
+      } catch {
         const pendingItem = { action: 'delete', id, timestamp: new Date().toISOString() };
         const existing = JSON.parse(localStorage.getItem('pending_products') || '[]');
         localStorage.setItem('pending_products', JSON.stringify([...existing, pendingItem]));

@@ -6,7 +6,6 @@ import { Sale, SaleItem } from "../../types";
 import { X, Calendar, Search, FileDown, RotateCcw } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { validateManagerPassword } from '../../lib/cart-engine';
 
 
 function SalesHistoryPage() {

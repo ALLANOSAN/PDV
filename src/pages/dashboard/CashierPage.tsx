@@ -10,7 +10,7 @@ function CashierPage() {
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const { data: operations, isLoading } = useQuery({
     queryKey: ['cash-operations', selectedDate],

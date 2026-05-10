@@ -20,9 +20,9 @@ export const OfflineSync = () => {
               p_items: sale.items
             });
             if (error) throw error;
-          } catch (e) {
+          } catch {
             remainingSales.push(sale);
-            console.error('Falha ao sincronizar venda:', e);
+            console.error('Falha ao sincronizar venda');
           }
         }
         
@@ -48,7 +48,7 @@ export const OfflineSync = () => {
               const { error } = await supabase.from('products').delete().eq('id', item.id);
               if (error) throw error;
             }
-          } catch (e) {
+          } catch {
             remainingProducts.push(item);
           }
         }

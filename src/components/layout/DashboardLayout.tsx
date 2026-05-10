@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, Package, DollarSign, LogOut, FileText, Search, CreditCard, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, Package, DollarSign, LogOut, FileText, Search, Sun, Moon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useTheme } from '../../hooks/useTheme';
 

@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { Product } from '../../types';
 import { toast } from 'sonner';
 import { Search, X, CreditCard, Banknote, RefreshCw, ShoppingCart } from 'lucide-react';
-import { CartItem, calculateTotal } from '../../lib/cart-engine';
+import { CartItem } from '../../lib/cart-engine';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useNavigate } from 'react-router-dom';
 import { OfflineSync } from '../../components/OfflineSync';
@@ -22,7 +22,18 @@ function SalesPage() {
   const [installments, setInstallments] = useState(1);
   
   const navigate = useNavigate();
-  const total = calculateTotal(cart);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  // ITEM 1: Busca segura via ilike do Supabase (evita SQL Injection)
+  const performSearch = useCallback(async (term: string) => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .ilike('name', `%${term}%`)
+      .limit(8);
+
+    if (!error) setSearchResults(data || []);
+  }, []);
 
   // ITEM 2: Debounce para performance e economia de banco
   useEffect(() => {
@@ -35,18 +46,7 @@ function SalesPage() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  // ITEM 1: Busca segura via ilike do Supabase (evita SQL Injection)
-  const performSearch = async (term: string) => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .ilike('name', `%${term}%`)
-      .limit(8);
-    
-    if (!error) setSearchResults(data || []);
-  };
+  }, [searchTerm, performSearch]);
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -123,7 +123,7 @@ function SalesPage() {
       setShowCardModal(false);
       setReceivedCash('');
       setInstallments(1);
-    } catch (err) {
+    } catch {
       // Fallback offline: Salva a transação completa para sincronia posterior
       const pendingData = {
         id: `pending_${getTimestamp()}`,
