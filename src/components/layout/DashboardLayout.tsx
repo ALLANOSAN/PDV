@@ -31,8 +31,8 @@ function DashboardLayout() {
               <ShoppingCart size={24} weight="fill" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tighter uppercase leading-none">PDV PRO</h2>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Local Edition</span>
+              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tighter uppercase leading-none">ESSÊNCIA COSMÉTICOS</h2>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema de Vendas</span>
             </div>
           </div>
         </div>
@@ -60,6 +60,16 @@ function DashboardLayout() {
         </nav>
 
         <div className="p-6 space-y-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="grid grid-cols-2 gap-2 text-[9px] font-black uppercase text-slate-400 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl mb-4">
+              <span>F1: Buscar</span>
+              <span>F2: Dinheiro</span>
+              <span>F3: Caixa</span>
+              <span>F4: Histórico</span>
+              <span>F5: Sangria</span>
+              <span>F6: Log</span>
+              <span>+/-: Qtd</span>
+              <span>ESC: Limpar</span>
+          </div>
           <button 
             onClick={toggleTheme}
             className="w-full flex items-center gap-3.5 p-3.5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl transition-all"

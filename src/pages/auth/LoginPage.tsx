@@ -40,7 +40,7 @@ function LoginPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Entrar no sistema</h1>
-        <p className="text-slate-500 mb-8">Bem-vindo de volta ao PDV Pro.</p>
+        <p className="text-slate-500 mb-8">Bem-vindo de volta à Essência Cosméticos.</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
@@ -61,7 +61,7 @@ function LoginPage() {
         </form>
 
         <p className="text-center text-sm text-slate-600 mt-6">
-          PDV Pro - Acesso Restrito
+          Essência Cosméticos - Acesso Restrito
         </p>
       </div>
     </div>

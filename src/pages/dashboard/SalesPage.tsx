@@ -62,11 +62,31 @@ function SalesPage() {
   const removeItem = (id: string) => setCart(prev => prev.filter(i => i.product.id !== id));
   const clearCart = () => { if (confirm('Limpar todo o carrinho?')) setCart([]); };
 
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && searchResults.length === 1) {
+      addToCart(searchResults[0]);
+    }
+  };
+
   useKeyboardShortcuts({
     onF1: () => document.getElementById('search-input')?.focus(),
     onF2: () => setShowCashModal(true),
     onF3: () => navigate('/dashboard/cashier'),
     onF4: () => navigate('/dashboard/history'),
+    onF5: () => navigate('/dashboard/cashier'),
+    onF6: () => navigate('/dashboard/history'),
+    onPlus: () => {
+      if (selectedProductId) {
+        setCart(prev => prev.map(i => i.product.id === selectedProductId ? { ...i, quantity: i.quantity + 1 } : i));
+      }
+    },
+    onMinus: () => {
+      if (selectedProductId) {
+        setCart(prev => prev.map(i => i.product.id === selectedProductId && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i));
+      }
+    },
     onEsc: () => clearCart()
   });
 
@@ -131,7 +151,7 @@ function SalesPage() {
       <OfflineSync />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Frente de Caixa</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Essência Cosméticos - Frente de Caixa</h2>
           <p className="text-slate-500 dark:text-slate-400">Registre suas vendas com rapidez e segurança.</p>
         </div>
         <button 
@@ -147,12 +167,14 @@ function SalesPage() {
         <div className="flex-1 flex flex-col gap-4 min-w-0 h-full">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg pointer-events-none">AUTO</div>
             <input 
               id="search-input" 
               className="w-full p-4 pl-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-lg" 
-              placeholder="F1 - Buscar produto por nome ou código..." 
+              placeholder="F1 - Buscar... (ENTER p/ adicionar)" 
               value={searchTerm} 
-              onChange={e => searchProducts(e.target.value)} 
+              onChange={e => searchProducts(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
             />
           </div>
           
@@ -189,16 +211,23 @@ function SalesPage() {
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-3 opacity-60">
                   <ShoppingCart size={48} strokeWidth={1.5} />
-                  <p>Carrinho vazio. Comece buscando um produto.</p>
+                  <p>Carrinho vazio. Use F1 para buscar.</p>
                 </div>
               ) : (
                 cart.map(item => (
-                  <div key={item.product.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex justify-between items-center group animate-in fade-in zoom-in-95 duration-200">
+                  <div 
+                    key={item.product.id} 
+                    onClick={() => setSelectedProductId(item.product.id)}
+                    className={`p-4 rounded-xl cursor-pointer transition-all border ${selectedProductId === item.product.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 shadow-sm' : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm'} flex justify-between items-center group animate-in fade-in zoom-in-95 duration-200`}
+                  >
                     <div className="flex flex-col">
                       <span className="font-bold text-slate-800 dark:text-slate-100">{item.product.name}</span>
                       <span className="text-sm text-slate-500">{item.quantity}x R$ {item.product.sale_price.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-4">
+                      {selectedProductId === item.product.id && (
+                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mr-2 bg-indigo-50 px-2 py-1 rounded-lg">AUTO</span>
+                      )}
                       <span className="font-mono font-bold text-slate-700 dark:text-slate-200">R$ {(item.product.sale_price * item.quantity).toFixed(2)}</span>
                       <button 
                         onClick={() => removeItem(item.product.id)} 
@@ -241,7 +270,7 @@ function SalesPage() {
                 className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none transition-all flex items-center justify-center gap-3 text-lg group"
               >
                 <CreditCard size={22} className="group-hover:scale-110 transition-transform" />
-                Pagamento Cartão
+                Cartão <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-md uppercase">Automatizado</span>
               </button>
             </div>
 

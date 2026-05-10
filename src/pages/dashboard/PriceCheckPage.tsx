@@ -24,13 +24,18 @@ function PriceCheckPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <h2 className="text-6xl font-black uppercase tracking-tighter">Consulta de Preço</h2>
-      
-      <div className="border-8 border-gray-900 p-8 flex items-center gap-4">
-        <Search size={40} />
+    <div className="p-8 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Essência Cosméticos - Consulta</h2>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Verifique preços e estoque de forma rápida.</p>
+        </div>
+      </div>
+
+      <div className="relative group max-w-2xl">
+        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={24} />
         <input 
-          className="w-full text-4xl font-black uppercase tracking-tighter focus:outline-none"
+          className="w-full p-6 pl-16 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-[2rem] shadow-xl shadow-slate-100 dark:shadow-none text-2xl font-black focus:border-indigo-500 outline-none transition-all"
           placeholder="NOME DO PRODUTO..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
@@ -38,17 +43,20 @@ function PriceCheckPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-2xl font-black animate-pulse uppercase">Consultando...</div>
+        <div className="flex items-center gap-3 text-slate-400 font-bold animate-pulse uppercase tracking-widest p-12 justify-center">
+            <RotateCcw className="animate-spin" size={32} />
+            <span className="font-bold uppercase tracking-widest text-xs">Consultando banco...</span>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map(p => (
-            <div key={p.id} className="border-4 border-gray-900 p-6 flex justify-between items-center hover:bg-emerald-50 transition-all">
+            <div key={p.id} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm flex justify-between items-center hover:border-indigo-200 transition-all group">
               <div>
-                <div className="text-xl font-black uppercase">{p.name}</div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{p.sku || 'SEM SKU'}</div>
+                <div className="text-lg font-black uppercase text-slate-800 dark:text-white group-hover:text-indigo-600 transition-colors">{p.name}</div>
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{p.sku || 'SEM SKU'}</div>
               </div>
-              <div className="text-3xl font-black text-emerald-600 flex items-center gap-2">
-                <Tag size={24} /> R$ {p.sale_price.toFixed(2)}
+              <div className="text-2xl font-black text-emerald-600 flex items-center gap-2">
+                <Tag size={20} /> R$ {p.sale_price.toFixed(2)}
               </div>
             </div>
           ))}

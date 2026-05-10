@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import { toast } from 'sonner';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Sale, SaleItem } from '../../types';
-import { X, Calendar, Search } from 'lucide-react';
+import { useState } from "react";
+import { supabase } from "../../lib/supabase";
+import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Sale, SaleItem } from "../../types";
+import { X, Calendar, Search, FileDown, RotateCcw } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { validateManagerPassword } from '../../lib/cart-engine';
+
 
 function SalesHistoryPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -34,6 +37,21 @@ function SalesHistoryPage() {
     },
   });
 
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.text(`Relatório de Vendas - ${selectedDate}`, 14, 15);
+    autoTable(doc, {
+        head: [['ID', 'Produtos', 'Método', 'Total']],
+        body: sales?.map(s => [
+            s.id.slice(0, 8),
+            s.sale_items.map(i => `${i.quantity}x ${i.products?.name}`).join(', '),
+            s.payment_method.toUpperCase(),
+            `R$ ${s.total_amount.toFixed(2)}`
+        ]) || []
+    });
+    doc.save(`vendas-${selectedDate}.pdf`);
+  };
+
   const cancelSale = async (sale: any) => {
     const password = prompt("Autenticação de Gerente necessária para cancelar venda:");
     if (!password) return;
@@ -62,11 +80,14 @@ function SalesHistoryPage() {
     <div className="p-8 space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Histórico</h2>
+          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Essência Cosméticos - Histórico</h2>
           <p className="text-slate-500 dark:text-slate-400 font-medium">Relatório detalhado de transações realizadas.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <button onClick={exportPDF} className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-700 transition-all">
+                <FileDown size={18}/> Exportar PDF
+            </button>
             <div className="relative group">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"/>
                 <input 
@@ -163,5 +184,6 @@ function SalesHistoryPage() {
     </div>
   );
 }
+
 
 export default SalesHistoryPage;
