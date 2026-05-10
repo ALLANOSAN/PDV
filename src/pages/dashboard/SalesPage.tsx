@@ -62,8 +62,6 @@ function SalesPage() {
   const removeItem = (id: string) => setCart(prev => prev.filter(i => i.product.id !== id));
   const clearCart = () => { if (confirm('Limpar todo o carrinho?')) setCart([]); };
 
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && searchResults.length === 1) {
       addToCart(searchResults[0]);
