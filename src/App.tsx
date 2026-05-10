@@ -7,6 +7,7 @@ import { Toaster } from 'sonner';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 
 // Lazy Loading das páginas
+const ChangePasswordPage = lazy(() => import('./pages/auth/ChangePasswordPage'));
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
 const DashboardLayout = lazy(() => import('./components/layout/DashboardLayout'));
 const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'));
@@ -55,6 +56,10 @@ function App() {
               <Route
                 path="/login"
                 element={session ? <Navigate to="/dashboard" /> : <LoginPage />}
+              />
+              <Route
+                path="/change-password"
+                element={session ? <ChangePasswordPage /> : <Navigate to="/login" />}
               />
 
               <Route
