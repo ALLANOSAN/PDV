@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Necessário no Tailwind v4: ativa o modo escuro por classe (.dark) em vez de media query */
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
   body {
     @apply bg-white text-slate-900 transition-colors duration-300;
