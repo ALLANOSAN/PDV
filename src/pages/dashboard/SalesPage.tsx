@@ -350,7 +350,7 @@ function SalesPage() {
                   size={22}
                   className="group-hover:scale-110 transition-transform"
                 />
-                Cartão
+                F5 - Cartão
               </button>
             </div>
 
