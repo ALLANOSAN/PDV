@@ -1,22 +1,17 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: white;
-  --color-foreground: #0f172a;
-  --color-primary: #1e3a8a;
-  --color-accent: #10b981;
-  --color-border: #e2e8f0;
-}
-
 @layer base {
-  body {
-    @apply bg-background text-foreground transition-colors duration-300;
+  :root {
+    --background: #ffffff;
+    --foreground: #0f172a;
   }
-}
-
-@layer base {
   .dark {
-    --color-background: #020617; /* slate-950 */
-    --color-foreground: #f8fafc; /* slate-50 */
+    --background: #020617;
+    --foreground: #f8fafc;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s, color 0.3s;
   }
 }
