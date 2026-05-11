@@ -55,8 +55,8 @@ function DashboardLayout() {
   return (
     <>
       <OfflineBanner />
-      <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 transition-colors pt-8">
-        <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm fixed h-full">
+      <div className="h-screen flex bg-slate-50 dark:bg-slate-950 transition-colors">
+        <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0">
           <div className="p-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
@@ -125,8 +125,8 @@ function DashboardLayout() {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950 transition-colors ml-64">
-          <div className="h-full min-h-screen">
+        <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950 transition-colors">
+          <div className="h-full">
             <Outlet />
           </div>
         </main>
