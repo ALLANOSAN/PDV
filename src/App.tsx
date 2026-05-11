@@ -1,22 +1,32 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEffect, useState, lazy, Suspense } from 'react';
-import { supabase } from './lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import { Toaster } from 'sonner';
-import { AppErrorBoundary } from './components/AppErrorBoundary';
-import { useTheme } from './hooks/useTheme';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, useState, lazy, Suspense } from "react";
+import { supabase } from "./lib/supabase";
+import { Session } from "@supabase/supabase-js";
+import { Toaster } from "sonner";
+import { AppErrorBoundary } from "./components/AppErrorBoundary";
+import { useTheme } from "./hooks/useTheme";
 
 // Lazy Loading das páginas
-const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
-const DashboardLayout = lazy(() => import('./components/layout/DashboardLayout'));
-const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'));
-const SalesPage = lazy(() => import('./pages/dashboard/SalesPage'));
-const PriceCheckPage = lazy(() => import('./pages/dashboard/PriceCheckPage'));
-const SalesHistoryPage = lazy(() => import('./pages/dashboard/SalesHistoryPage'));
-const InventoryPage = lazy(() => import('./pages/dashboard/InventoryPage'));
-const CashierPage = lazy(() => import('./pages/dashboard/CashierPage'));
-const LandingPage = lazy(() => import('./pages/LandingPage'));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const DashboardLayout = lazy(
+  () => import("./components/layout/DashboardLayout"),
+);
+const DashboardPage = lazy(() => import("./pages/dashboard/DashboardPage"));
+const SalesPage = lazy(() => import("./pages/dashboard/SalesPage"));
+const PriceCheckPage = lazy(() => import("./pages/dashboard/PriceCheckPage"));
+const SalesHistoryPage = lazy(
+  () => import("./pages/dashboard/SalesHistoryPage"),
+);
+const InventoryPage = lazy(() => import("./pages/dashboard/InventoryPage"));
+const CashierPage = lazy(() => import("./pages/dashboard/CashierPage"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient();
 
@@ -28,13 +38,13 @@ const PageLoader = () => (
 
 function AppRoutes({ session }: { session: Session | null }) {
   const location = useLocation();
-  const isProtectedRoute = location.pathname.startsWith('/dashboard');
+  const isProtectedRoute = location.pathname.startsWith("/dashboard");
 
   if (isProtectedRoute && !session) {
     return <Navigate to="/login" />;
   }
 
-  if (location.pathname === '/login' && session) {
+  if (location.pathname === "/login" && session) {
     return <Navigate to="/dashboard" />;
   }
 
@@ -55,10 +65,21 @@ function AppRoutes({ session }: { session: Session | null }) {
           path="*"
           element={
             <div className="h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-6 text-center">
-              <h1 className="text-9xl font-black text-indigo-100 dark:text-slate-900 animate-pulse">404</h1>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-4 uppercase tracking-tighter">Página Perdida</p>
-              <p className="text-slate-500 mb-8 max-w-xs font-medium">O endereço que você tentou acessar não existe ou foi movido para outro setor.</p>
-              <button onClick={() => window.location.href = '/'} className="bg-indigo-600 text-white px-10 py-4 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 dark:shadow-none transition-all hover:scale-105">Voltar ao Início</button>
+              <h1 className="text-9xl font-black text-indigo-100 dark:text-slate-900 animate-pulse">
+                404
+              </h1>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-4 uppercase tracking-tighter">
+                Página Perdida
+              </p>
+              <p className="text-slate-500 mb-8 max-w-xs font-medium">
+                O endereço que você tentou acessar não existe ou foi movido para
+                outro setor.
+              </p>
+              <button
+                onClick={() => (window.location.href = "/")}
+                className="bg-indigo-600 text-white px-10 py-4 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 dark:shadow-none transition-all hover:scale-105">
+                Voltar ao Início
+              </button>
             </div>
           }
         />
@@ -79,7 +100,9 @@ function App() {
       setChecking(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
