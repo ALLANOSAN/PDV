@@ -10,6 +10,13 @@
 
 @layer base {
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+@layer base {
+  .dark {
+    --color-background: #020617; /* slate-950 */
+    --color-foreground: #f8fafc; /* slate-50 */
   }
 }
