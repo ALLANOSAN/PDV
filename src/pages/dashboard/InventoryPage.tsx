@@ -359,9 +359,6 @@ function InventoryPage() {
                   {...register("unit")}
                   className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-4 font-bold focus:outline-none focus:border-indigo-500 transition-colors appearance-none">
                   <option value="un">UNIDADE (UN)</option>
-                  <option value="kg">QUILO (KG)</option>
-                  <option value="pt">PACOTE (PT)</option>
-                  <option value="lt">LITRO (LT)</option>
                 </select>
               </div>
 
