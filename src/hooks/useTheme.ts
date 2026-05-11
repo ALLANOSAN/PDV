@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => 
@@ -13,5 +12,9 @@ export const useTheme = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  return { theme, toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light'), Moon, Sun };
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  return { theme, toggleTheme };
 };
