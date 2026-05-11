@@ -331,7 +331,7 @@ function InventoryPage() {
                 <input
                   {...register("name")}
                   className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-4 font-bold text-lg focus:outline-none focus:border-indigo-500 transition-colors"
-                  placeholder="Ex: Cerveja Lata 350ml"
+                  placeholder="Ex: Shampoo Hidratante 300ml"
                 />
                 {errors.name && (
                   <p className="text-red-500 text-[10px] font-black uppercase mt-2 ml-1 tracking-wider">
