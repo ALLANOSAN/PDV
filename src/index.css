@@ -1,17 +1,10 @@
 @import "tailwindcss";
 
 @layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #0f172a;
-  }
-  .dark {
-    --background: #020617;
-    --foreground: #f8fafc;
-  }
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    transition: background-color 0.3s, color 0.3s;
+    @apply bg-white text-slate-900 transition-colors duration-300;
+  }
+  .dark body {
+    @apply bg-slate-950 text-slate-50;
   }
 }
