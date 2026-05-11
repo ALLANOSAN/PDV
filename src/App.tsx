@@ -28,47 +28,25 @@ const PageLoader = () => (
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(true);
   const location = useLocation();
   
-  // Initialize theme on app load
   useTheme();
 
   useEffect(() => {
-    let ignore = false;
-    
-    const checkSession = async () => {
-      if (location.pathname.startsWith('/dashboard') && !ignore) {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (!ignore) {
-          if (error || !session) {
-            setSession(null);
-          } else {
-            setSession(session);
-          }
-        }
-      }
-      if (!ignore) setLoading(false);
-    };
-
-    checkSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!ignore) {
-        setSession(session);
-        if (_event === 'signed_out') {
-          window.location.href = '/login';
-        }
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setChecking(false);
     });
 
-    return () => {
-      ignore = true;
-      subscription.unsubscribe();
-    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) return <PageLoader />;
+  if (checking) return <PageLoader />;
 
   const isProtectedRoute = location.pathname.startsWith('/dashboard');
 
