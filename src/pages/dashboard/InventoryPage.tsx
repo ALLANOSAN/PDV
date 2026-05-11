@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Product } from '../../types';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, RotateCcw } from 'lucide-react';
 
 const productSchema = z.object({
   name: z.string().min(2, 'Nome muito curto'),

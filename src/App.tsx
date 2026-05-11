@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { Toaster } from 'sonner';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
+import { useTheme } from './hooks/useTheme';
 
 // Lazy Loading das páginas
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
@@ -28,21 +29,47 @@ const PageLoader = () => (
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  
+  // Initialize theme on app load
+  useTheme();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    const checkSession = async () => {
+      if (location.pathname.startsWith('/dashboard')) {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error || !session) {
+          setSession(null);
+        } else {
+          setSession(session);
+        }
+      }
       setLoading(false);
-    });
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (_event === 'signed_out') {
+        window.location.href = '/login';
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [location.pathname]);
 
   if (loading) return <PageLoader />;
+
+  const isProtectedRoute = location.pathname.startsWith('/dashboard');
+
+  if (isProtectedRoute && !session) {
+    return <Navigate to="/login" />;
+  }
+
+  if (location.pathname === '/login' && session) {
+    return <Navigate to="/dashboard" />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -52,15 +79,8 @@ function App() {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route
-                path="/login"
-                element={session ? <Navigate to="/dashboard" /> : <LoginPage />}
-              />
-
-              <Route
-                path="/dashboard"
-                element={session ? <DashboardLayout /> : <Navigate to="/login" />}
-              >
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/dashboard" element={<DashboardLayout />}>
                 <Route index element={<DashboardPage />} />
                 <Route path="sales" element={<SalesPage />} />
                 <Route path="price-check" element={<PriceCheckPage />} />
@@ -68,7 +88,6 @@ function App() {
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="cashier" element={<CashierPage />} />
               </Route>
-
               <Route path="*" element={
                 <div className="h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-6 text-center">
                   <h1 className="text-9xl font-black text-indigo-100 dark:text-slate-900 animate-pulse">404</h1>

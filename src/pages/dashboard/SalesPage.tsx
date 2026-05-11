@@ -48,6 +48,9 @@ function SalesPage() {
     return () => clearTimeout(timer);
   }, [searchTerm, performSearch]);
 
+  // Calculate total
+  const total = cart.reduce((sum, item) => sum + (item.quantity * item.product.sale_price), 0);
+
   const addToCart = (product: Product) => {
     setCart(prev => {
       const existing = prev.find(i => i.product.id === product.id);

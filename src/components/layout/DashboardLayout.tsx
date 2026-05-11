@@ -2,6 +2,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, Package, DollarSign, LogOut, FileText, Search, Sun, Moon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useTheme } from '../../hooks/useTheme';
+import { OfflineBanner } from '../OfflineBanner';
 
 function DashboardLayout() {
   const navigate = useNavigate();
@@ -23,8 +24,10 @@ function DashboardLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 transition-colors">
-      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm">
+    <>
+      <OfflineBanner />
+      <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 transition-colors pt-8">
+        <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm fixed h-full">
         <div className="p-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
@@ -93,6 +96,7 @@ function DashboardLayout() {
         </div>
       </main>
     </div>
+    </>
   );
 }
 
