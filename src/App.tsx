@@ -56,10 +56,6 @@ function App() {
                 path="/login"
                 element={session ? <Navigate to="/dashboard" /> : <LoginPage />}
               />
-              <Route
-                path="/change-password"
-                element={session ? <ChangePasswordPage /> : <Navigate to="/login" />}
-              />
 
               <Route
                 path="/dashboard"
