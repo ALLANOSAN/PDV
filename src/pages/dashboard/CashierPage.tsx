@@ -275,12 +275,12 @@ function CashierPage() {
         </div>
 
         {/* Card de Histórico */}
-        <div className="rounded-[2.5rem] border-2 border-slate-800 dark:border-slate-700 bg-slate-900 text-white shadow-2xl overflow-hidden flex flex-col h-[500px]">
-          <div className="p-8 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
-            <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest">
+        <div className="rounded-[2.5rem] border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl shadow-slate-100 dark:shadow-none overflow-hidden flex flex-col h-[500px]">
+          <div className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex justify-between items-center">
+            <h3 className="text-xs font-black text-indigo-600 dark:text-emerald-400 uppercase tracking-widest">
               LOGS DO DIA
             </h3>
-            <RotateCcw size={16} className="text-slate-600" />
+            <RotateCcw size={16} className="text-slate-400" />
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
@@ -292,24 +292,24 @@ function CashierPage() {
               operations?.map((op) => (
                 <div
                   key={op.id}
-                  className="bg-slate-800/50 hover:bg-slate-800 p-4 rounded-2xl border border-slate-700/50 flex justify-between items-center group transition-all">
+                  className="bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/50 flex justify-between items-center group transition-all">
                   <div>
                     <div
-                      className={`text-[10px] font-black uppercase tracking-widest mb-0.5 ${op.type === "sangria" ? "text-red-400" : op.type === "reforco" ? "text-blue-400" : "text-emerald-400"}`}>
+                      className={`text-[10px] font-black uppercase tracking-widest mb-0.5 ${op.type === "sangria" ? "text-red-500" : op.type === "reforco" ? "text-blue-500" : "text-emerald-500"}`}>
                       {op.type}
                     </div>
                     <div className="font-black text-lg tracking-tight">
                       R$ {op.amount.toFixed(2)}
                     </div>
                     {op.reason && (
-                      <div className="text-[10px] text-slate-500 font-bold uppercase truncate w-32">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase truncate w-32">
                         {op.reason}
                       </div>
                     )}
                   </div>
                   <button
                     onClick={() => handleEstorno(op)}
-                    className="p-2 text-slate-600 hover:text-white hover:bg-slate-700 rounded-xl transition-all opacity-0 group-hover:opacity-100">
+                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100">
                     <RotateCcw size={18} />
                   </button>
                 </div>
