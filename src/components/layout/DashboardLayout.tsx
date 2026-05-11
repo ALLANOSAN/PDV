@@ -103,8 +103,8 @@ function DashboardLayout() {
               <span>F2: Dinheiro</span>
               <span>F3: Caixa</span>
               <span>F4: Histórico</span>
-              <span>F5: Sangria</span>
-              <span>F6: Log</span>
+              <span>F5: Cartão</span>
+              <span>F6: Limpar</span>
               <span>+/-: Qtd</span>
               <span>ESC: Limpar</span>
             </div>

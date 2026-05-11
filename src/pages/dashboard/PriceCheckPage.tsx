@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { Product } from "../../types";
 import { Search, Tag } from "lucide-react";
@@ -9,22 +9,35 @@ function PriceCheckPage() {
   const [results, setResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = async (term: string) => {
+  useEffect(() => {
+    let isActive = true;
+    const timer = window.setTimeout(async () => {
+      if (searchTerm.length < 2) {
+        setResults([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .ilike("name", `%${searchTerm}%`)
+        .limit(10);
+
+      if (!isActive) return;
+      setResults(data || []);
+      setIsLoading(false);
+    }, 250);
+
+    return () => {
+      isActive = false;
+      window.clearTimeout(timer);
+    };
+  }, [searchTerm]);
+
+  const handleSearch = (term: string) => {
     setSearchTerm(term);
-    if (term.length < 2) {
-      setResults([]);
-      return;
-    }
-
-    setIsLoading(true);
-    const { data } = await supabase
-      .from("products")
-      .select("*")
-      .ilike("name", `%${term}%`)
-      .limit(10);
-
-    setResults(data || []);
-    setIsLoading(false);
   };
 
   return (

@@ -17,14 +17,20 @@ export default function DashboardPage() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
+      const thirtyDaysAgo = new Date(
+        Date.now() - 1000 * 60 * 60 * 24 * 30,
+      ).toISOString();
       const { data: sales } = await supabase
         .from("sales")
         .select("*, sale_items(*)")
-        .order("created_at", { ascending: true });
+        .gte("created_at", thirtyDaysAgo)
+        .order("created_at", { ascending: true })
+        .limit(100);
       const { data: products } = await supabase.from("products").select("*");
 
+      const salesList = sales || [];
       // Processamento de dados para gráficos
-      const dailySales = sales?.reduce((acc: any, sale) => {
+      const dailySales = salesList.reduce((acc: any, sale) => {
         const date = new Date(sale.created_at).toLocaleDateString();
         acc[date] = (acc[date] || 0) + sale.total_amount;
         return acc;

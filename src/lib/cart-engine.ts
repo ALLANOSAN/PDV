@@ -1,4 +1,5 @@
 import type { CartItem } from "../types";
+import { supabase } from "./supabase";
 
 export const calculateTotal = (items: CartItem[]): number => {
   return items.reduce(
@@ -11,10 +12,18 @@ export const calculateChange = (total: number, received: number): number => {
   return Math.max(0, received - total);
 };
 
-// Verificação usando variável de ambiente
-export const validateManagerPassword = (password: string): boolean => {
-  const managerPass = import.meta.env.VITE_MANAGER_PASSWORD || "1234";
-  return password === managerPass;
+// Validação no servidor (RPC) - mais seguro que client-side
+export const validateManagerPassword = async (password: string): Promise<boolean> => {
+  const { data, error } = await supabase.rpc('validate_manager_password', {
+    p_password: password,
+  });
+  
+  if (error) {
+    console.error('Erro ao validar senha:', error);
+    return false;
+  }
+  
+  return data ?? false;
 };
 
 // Reexporta CartItem para facilitar importação direta deste módulo

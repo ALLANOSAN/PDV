@@ -12,13 +12,24 @@ import {
 } from "lucide-react";
 import { calculateCurrentBalance } from "../../lib/cash-engine";
 import { Calendar } from "lucide-react";
+import { CustomDialog } from "../../components/ui/CustomDialog";
+
+interface DialogConfig {
+  type: "confirm" | "alert";
+  title: string;
+  message: string;
+  onConfirm: () => void;
+}
+
 function CashierPage() {
-  const [amount, setAmount] = useState("");
+  const [openCloseAmount, setOpenCloseAmount] = useState("");
+  const [movementAmount, setMovementAmount] = useState("");
   const [reason, setReason] = useState("");
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );
   const queryClient = useQueryClient();
+  const [dialogConfig, setDialogConfig] = useState<DialogConfig | null>(null);
 
   const { data: operations, isLoading } = useQuery({
     queryKey: ["cash-operations", selectedDate],
@@ -56,17 +67,25 @@ function CashierPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cash-operations"] });
       toast.success("Operação registrada!");
-      setAmount("");
+      setOpenCloseAmount("");
+      setMovementAmount("");
       setReason("");
+      setDialogConfig(null);
     },
   });
 
-  const handleEstorno = async (originalOp: CashOperation) => {
-    if (!confirm("Deseja estornar esta movimentação?")) return;
-    await operationMutation.mutateAsync({
-      type: originalOp.type === "sangria" ? "reforco" : "sangria",
-      amount: originalOp.amount,
-      reason: `ESTORNO de: ${originalOp.reason || "Sem motivo"}`,
+  const handleEstorno = (originalOp: CashOperation) => {
+    setDialogConfig({
+      type: "confirm",
+      title: "Estornar Movimentação",
+      message: "Deseja estornar esta movimentação de caixa?",
+      onConfirm: () => {
+        operationMutation.mutateAsync({
+          type: originalOp.type === "sangria" ? "reforco" : "sangria",
+          amount: originalOp.amount,
+          reason: `ESTORNO de: ${originalOp.reason || "Sem motivo"}`,
+        });
+      },
     });
   };
 
@@ -128,8 +147,8 @@ function CashierPage() {
                   <input
                     type="number"
                     placeholder="0.00"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={openCloseAmount}
+                    onChange={(e) => setOpenCloseAmount(e.target.value)}
                     className="w-full bg-white dark:bg-slate-800 border-2 border-red-100 dark:border-red-900/20 p-4 pl-12 rounded-2xl font-black text-2xl text-red-600 outline-none focus:border-red-500 transition-all"
                   />
                 </div>
@@ -150,8 +169,8 @@ function CashierPage() {
                   <input
                     type="number"
                     placeholder="Valor Físico Final"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={openCloseAmount}
+                    onChange={(e) => setOpenCloseAmount(e.target.value)}
                     className="w-full bg-white dark:bg-slate-800 border-2 border-emerald-100 dark:border-emerald-900/20 p-4 pl-12 rounded-2xl font-black text-2xl text-emerald-600 outline-none focus:border-emerald-500 transition-all"
                   />
                 </div>
@@ -164,12 +183,12 @@ function CashierPage() {
               isClosed
                 ? operationMutation.mutate({
                     type: "open",
-                    amount: parseFloat(amount) || 0,
+                    amount: parseFloat(openCloseAmount) || 0,
                     reason: "Abertura de Dia",
                   })
                 : operationMutation.mutate({
                     type: "close",
-                    amount: parseFloat(amount) || 0,
+                    amount: parseFloat(openCloseAmount) || 0,
                     reason: "Fechamento de Dia",
                   })
             }
@@ -198,8 +217,8 @@ function CashierPage() {
                 <input
                   className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 pl-12 rounded-2xl font-black text-2xl outline-none focus:border-indigo-500 transition-all"
                   placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  value={movementAmount}
+                  onChange={(e) => setMovementAmount(e.target.value)}
                 />
               </div>
             </div>
@@ -221,7 +240,7 @@ function CashierPage() {
                 onClick={() =>
                   operationMutation.mutate({
                     type: "sangria",
-                    amount: parseFloat(amount),
+                    amount: parseFloat(movementAmount) || 0,
                     reason,
                   })
                 }
@@ -238,7 +257,7 @@ function CashierPage() {
                 onClick={() =>
                   operationMutation.mutate({
                     type: "reforco",
-                    amount: parseFloat(amount),
+                    amount: parseFloat(movementAmount) || 0,
                     reason,
                   })
                 }
@@ -299,6 +318,19 @@ function CashierPage() {
           </div>
         </div>
       </div>
+      {dialogConfig && (
+        <CustomDialog
+          isOpen={!!dialogConfig}
+          type={dialogConfig.type}
+          title={dialogConfig.title}
+          message={dialogConfig.message}
+          onConfirm={() => {
+            dialogConfig.onConfirm();
+            setDialogConfig(null);
+          }}
+          onCancel={() => setDialogConfig(null)}
+        />
+      )}
     </div>
   );
 }

@@ -10,10 +10,18 @@ import {
   RefreshCw,
   ShoppingCart,
 } from "lucide-react";
-import type { CartItem } from "../../lib/cart-engine";
+import { calculateTotal, type CartItem } from "../../lib/cart-engine";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import { useNavigate } from "react-router-dom";
 import { OfflineSync } from "../../components/OfflineSync";
+import { CustomDialog } from "../../components/ui/CustomDialog";
+
+interface DialogConfig {
+  type: "confirm" | "alert" | "prompt";
+  title: string;
+  message: string;
+  onConfirm: (value?: string) => void;
+}
 
 function SalesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +31,7 @@ function SalesPage() {
 
   const [showCashModal, setShowCashModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState<DialogConfig | null>(null);
 
   const [receivedCash, setReceivedCash] = useState("");
   const [cardType, setCardType] = useState<"debit" | "credit">("debit");
@@ -57,11 +66,8 @@ function SalesPage() {
     return () => clearTimeout(timer);
   }, [searchTerm, performSearch]);
 
-  // Calculate total
-  const total = cart.reduce(
-    (sum, item) => sum + item.quantity * item.product.sale_price,
-    0,
-  );
+  // ITEM 8: Uso da função centralizada de cálculo
+  const total = calculateTotal(cart);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -80,7 +86,13 @@ function SalesPage() {
   const removeItem = (id: string) =>
     setCart((prev) => prev.filter((i) => i.product.id !== id));
   const clearCart = () => {
-    if (confirm("Limpar todo o carrinho?")) setCart([]);
+    setDialogConfig({
+      type: "confirm",
+      title: "Limpar Carrinho",
+      message:
+        "Deseja limpar todo o carrinho? Essa ação não pode ser desfeita.",
+      onConfirm: () => setCart([]),
+    });
   };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
@@ -94,8 +106,8 @@ function SalesPage() {
     onF2: () => setShowCashModal(true),
     onF3: () => navigate("/dashboard/cashier"),
     onF4: () => navigate("/dashboard/history"),
-    onF5: () => navigate("/dashboard/cashier"),
-    onF6: () => navigate("/dashboard/history"),
+    onF5: () => setShowCardModal(true),
+    onF6: clearCart,
     onPlus: () => {
       if (selectedProductId) {
         setCart((prev) =>
@@ -496,7 +508,12 @@ function SalesPage() {
                       cardType === "debit"
                         ? "Passe no DÉBITO. Aprovou?"
                         : `Passe no CRÉDITO (${installments}x). Aprovou?`;
-                    if (confirm(msg)) finalizeSale("card", total);
+                    setDialogConfig({
+                      type: "confirm",
+                      title: "Confirmar Pagamento",
+                      message: msg,
+                      onConfirm: () => finalizeSale("card", total),
+                    });
                   }}
                   disabled={isProcessing}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-all">
@@ -506,6 +523,19 @@ function SalesPage() {
             </div>
           </div>
         </div>
+      )}
+      {dialogConfig && (
+        <CustomDialog
+          isOpen={!!dialogConfig}
+          type={dialogConfig.type}
+          title={dialogConfig.title}
+          message={dialogConfig.message}
+          onConfirm={(value) => {
+            dialogConfig.onConfirm(value);
+            setDialogConfig(null);
+          }}
+          onCancel={() => setDialogConfig(null)}
+        />
       )}
     </div>
   );

@@ -21,15 +21,17 @@ export const useKeyboardShortcuts = (actions: {
     const handleKeyDown = (e: KeyboardEvent) => {
       const { onF1, onF2, onF3, onF4, onF5, onF6, onPlus, onMinus, onEsc } = actionsRef.current;
       
-      if (e.key === 'F1') { e.preventDefault(); onF1(); }
-      else if (e.key === 'F2') { e.preventDefault(); onF2(); }
-      else if (e.key === 'F3') { e.preventDefault(); onF3(); }
-      else if (e.key === 'F4') { e.preventDefault(); onF4(); }
-      else if (e.key === 'F5') { e.preventDefault(); onF5(); }
-      else if (e.key === 'F6') { e.preventDefault(); onF6(); }
-      else if (e.key === '+' || e.key === '=') { e.preventDefault(); onPlus(); }
-      else if (e.key === '-' || e.key === '_') { e.preventDefault(); onMinus(); }
-      else if (e.key === 'Escape') { e.preventDefault(); onEsc(); }
+      switch(e.key) {
+        case 'F1': e.preventDefault(); onF1(); break;
+        case 'F2': e.preventDefault(); onF2(); break;
+        case 'F3': e.preventDefault(); onF3(); break; // Caixa (Cashier)
+        case 'F4': e.preventDefault(); onF4(); break; // Histórico (Sales History)
+        case 'F5': e.preventDefault(); onF5(); break; // Sangria/Reforço (Cashier Action)
+        case 'F6': e.preventDefault(); onF6(); break; // Log/Backup (ou custom)
+        case '+': case '=': e.preventDefault(); onPlus(); break;
+        case '-': case '_': e.preventDefault(); onMinus(); break;
+        case 'Escape': e.preventDefault(); onEsc(); break;
+      }
     };
     
     window.addEventListener('keydown', handleKeyDown);

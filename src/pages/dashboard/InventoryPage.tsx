@@ -7,6 +7,14 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Product } from "../../types";
 import { Plus, Edit2, Trash2, X, RotateCcw } from "lucide-react";
+import { CustomDialog } from "../../components/ui/CustomDialog";
+
+interface DialogConfig {
+  type: "confirm" | "alert" | "prompt";
+  title: string;
+  message: string;
+  onConfirm: (value?: string) => void;
+}
 
 const productSchema = z.object({
   name: z.string().min(2, "Nome muito curto"),
@@ -22,6 +30,9 @@ type ProductForm = z.infer<typeof productSchema>;
 function InventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [dialogConfig, setDialogConfig] = useState<DialogConfig | null>(null);
+  const [pendingDeleteProduct, setPendingDeleteProduct] =
+    useState<Product | null>(null);
   const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery({
@@ -262,8 +273,18 @@ function InventoryPage() {
                           </button>
                           <button
                             onClick={() => {
-                              if (confirm("Deseja remover este produto?"))
-                                deleteMutation.mutate(product.id);
+                              setPendingDeleteProduct(product);
+                              setDialogConfig({
+                                type: "confirm",
+                                title: "Remover Produto",
+                                message:
+                                  "Deseja remover este produto do estoque?",
+                                onConfirm: () => {
+                                  deleteMutation.mutate(product.id);
+                                  setDialogConfig(null);
+                                  setPendingDeleteProduct(null);
+                                },
+                              });
                             }}
                             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
                             <Trash2 size={18} />
@@ -299,7 +320,9 @@ function InventoryPage() {
             </div>
 
             <form
-              onSubmit={handleSubmit((data) => saveMutation.mutate(data as ProductForm))}
+              onSubmit={handleSubmit((data) =>
+                saveMutation.mutate(data as ProductForm),
+              )}
               className="grid grid-cols-2 gap-6">
               <div className="col-span-2">
                 <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
@@ -390,6 +413,23 @@ function InventoryPage() {
             </form>
           </div>
         </div>
+      )}
+      {dialogConfig && (
+        <CustomDialog
+          isOpen={!!dialogConfig}
+          type={dialogConfig.type}
+          title={dialogConfig.title}
+          message={dialogConfig.message}
+          onConfirm={(value) => {
+            dialogConfig.onConfirm(value);
+            setDialogConfig(null);
+            setPendingDeleteProduct(null);
+          }}
+          onCancel={() => {
+            setDialogConfig(null);
+            setPendingDeleteProduct(null);
+          }}
+        />
       )}
     </div>
   );
