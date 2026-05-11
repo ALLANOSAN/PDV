@@ -15,8 +15,8 @@ export interface Sale {
   id: string;
   user_id: string;
   total_amount: number;
-  payment_method: 'cash' | 'card';
-  status: 'completed' | 'pending' | 'canceled';
+  payment_method: "cash" | "card";
+  status: "completed" | "pending" | "canceled";
   created_at: string;
 }
 
@@ -40,7 +40,7 @@ export interface CartItem {
 export interface CashOperation {
   id: string;
   user_id: string;
-  type: 'open' | 'close' | 'sangria' | 'reforco';
+  type: "open" | "close" | "sangria" | "reforco";
   amount: number;
   initial_balance?: number;
   final_balance?: number;

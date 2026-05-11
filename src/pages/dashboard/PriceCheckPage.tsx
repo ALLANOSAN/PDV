@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Product } from '../../types';
 import { Search, Tag } from 'lucide-react';
+import { RotateCcw } from "lucide-react";
 
 function PriceCheckPage() {
   const [searchTerm, setSearchTerm] = useState('');

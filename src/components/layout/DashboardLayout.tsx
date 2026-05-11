@@ -31,7 +31,7 @@ function DashboardLayout() {
         <div className="p-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
-              <ShoppingCart size={24} weight="fill" />
+              <ShoppingCart size={24} />
             </div>
             <div>
               <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tighter uppercase leading-none">ESSÊNCIA COSMÉTICOS</h2>
