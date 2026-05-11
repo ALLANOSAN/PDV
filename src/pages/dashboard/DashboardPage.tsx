@@ -90,32 +90,32 @@ export default function DashboardPage() {
             label: "Faturamento Total",
             value: `R$ ${stats?.revenue.toFixed(2)}`,
             icon: <TrendingUp className="text-emerald-500" />,
-            color: "bg-emerald-50 dark:bg-emerald-900/10",
+            color: "bg-emerald-50 dark:bg-emerald-900/20",
           },
           {
             label: "Total de Vendas",
             value: stats?.totalSales,
             icon: <ShoppingBag className="text-indigo-500" />,
-            color: "bg-indigo-50 dark:bg-indigo-900/10",
+            color: "bg-indigo-50 dark:bg-indigo-900/20",
           },
           {
             label: "Ticket Médio",
             value: `R$ ${stats?.avgTicket.toFixed(2)}`,
             icon: <Users className="text-blue-500" />,
-            color: "bg-blue-50 dark:bg-blue-900/10",
+            color: "bg-blue-50 dark:bg-blue-900/20",
           },
           {
             label: "Itens no Estoque",
             value: stats?.inventoryCount,
             icon: <CreditCard className="text-amber-500" />,
-            color: "bg-amber-50 dark:bg-amber-900/10",
+            color: "bg-amber-50 dark:bg-amber-900/20",
           },
         ].map((stat, i) => (
           <div
             key={i}
-            className={`p-6 rounded-[2rem] border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all shadow-sm ${stat.color}`}>
+            className={`p-6 rounded-[2rem] border-2 border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all shadow-sm ${stat.color}`}>
             <div className="flex justify-between items-start mb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 {stat.label}
               </span>
               <div className="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
@@ -163,7 +163,8 @@ export default function DashboardPage() {
                   contentStyle={{
                     borderRadius: "16px",
                     border: "none",
-                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                    backgroundColor: "var(--color-slate-900)",
+                    color: "white",
                     fontWeight: "bold",
                   }}
                 />
@@ -203,10 +204,10 @@ export default function DashboardPage() {
               </PieChart>
             </ResponsiveContainer>
             <div className="flex gap-6 mt-4">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" /> Dinheiro
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
                 <div className="w-2 h-2 rounded-full bg-indigo-500" /> Cartão
               </div>
             </div>
