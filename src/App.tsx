@@ -26,11 +26,51 @@ const PageLoader = () => (
   </div>
 );
 
+function AppRoutes({ session }: { session: Session | null }) {
+  const location = useLocation();
+  const isProtectedRoute = location.pathname.startsWith('/dashboard');
+
+  if (isProtectedRoute && !session) {
+    return <Navigate to="/login" />;
+  }
+
+  if (location.pathname === '/login' && session) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="sales" element={<SalesPage />} />
+          <Route path="price-check" element={<PriceCheckPage />} />
+          <Route path="history" element={<SalesHistoryPage />} />
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="cashier" element={<CashierPage />} />
+        </Route>
+        <Route
+          path="*"
+          element={
+            <div className="h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-6 text-center">
+              <h1 className="text-9xl font-black text-indigo-100 dark:text-slate-900 animate-pulse">404</h1>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-4 uppercase tracking-tighter">Página Perdida</p>
+              <p className="text-slate-500 mb-8 max-w-xs font-medium">O endereço que você tentou acessar não existe ou foi movido para outro setor.</p>
+              <button onClick={() => window.location.href = '/'} className="bg-indigo-600 text-white px-10 py-4 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 dark:shadow-none transition-all hover:scale-105">Voltar ao Início</button>
+            </div>
+          }
+        />
+      </Routes>
+    </Suspense>
+  );
+}
+
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [checking, setChecking] = useState(true);
-  const location = useLocation();
-  
+
   useTheme();
 
   useEffect(() => {
@@ -48,43 +88,12 @@ function App() {
 
   if (checking) return <PageLoader />;
 
-  const isProtectedRoute = location.pathname.startsWith('/dashboard');
-
-  if (isProtectedRoute && !session) {
-    return <Navigate to="/login" />;
-  }
-
-  if (location.pathname === '/login' && session) {
-    return <Navigate to="/dashboard" />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster position="top-right" richColors />
       <AppErrorBoundary>
         <Router>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/dashboard" element={<DashboardLayout />}>
-                <Route index element={<DashboardPage />} />
-                <Route path="sales" element={<SalesPage />} />
-                <Route path="price-check" element={<PriceCheckPage />} />
-                <Route path="history" element={<SalesHistoryPage />} />
-                <Route path="inventory" element={<InventoryPage />} />
-                <Route path="cashier" element={<CashierPage />} />
-              </Route>
-              <Route path="*" element={
-                <div className="h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-6 text-center">
-                  <h1 className="text-9xl font-black text-indigo-100 dark:text-slate-900 animate-pulse">404</h1>
-                  <p className="text-2xl font-bold text-slate-800 dark:text-white mt-4 uppercase tracking-tighter">Página Perdida</p>
-                  <p className="text-slate-500 mb-8 max-w-xs font-medium">O endereço que você tentou acessar não existe ou foi movido para outro setor.</p>
-                  <button onClick={() => window.location.href = '/'} className="bg-indigo-600 text-white px-10 py-4 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 dark:shadow-none transition-all hover:scale-105">Voltar ao Início</button>
-                </div>
-              } />
-            </Routes>
-          </Suspense>
+          <AppRoutes session={session} />
         </Router>
       </AppErrorBoundary>
     </QueryClientProvider>
