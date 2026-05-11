@@ -350,10 +350,7 @@ function SalesPage() {
                   size={22}
                   className="group-hover:scale-110 transition-transform"
                 />
-                Cartão{" "}
-                <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-md uppercase">
-                  Automatizado
-                </span>
+                Cartão
               </button>
             </div>
 
