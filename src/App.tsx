@@ -35,29 +35,38 @@ function App() {
   useTheme();
 
   useEffect(() => {
+    let ignore = false;
+    
     const checkSession = async () => {
-      if (location.pathname.startsWith('/dashboard')) {
+      if (location.pathname.startsWith('/dashboard') && !ignore) {
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error || !session) {
-          setSession(null);
-        } else {
-          setSession(session);
+        if (!ignore) {
+          if (error || !session) {
+            setSession(null);
+          } else {
+            setSession(session);
+          }
         }
       }
-      setLoading(false);
+      if (!ignore) setLoading(false);
     };
 
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (_event === 'signed_out') {
-        window.location.href = '/login';
+      if (!ignore) {
+        setSession(session);
+        if (_event === 'signed_out') {
+          window.location.href = '/login';
+        }
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [location.pathname]);
+    return () => {
+      ignore = true;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   if (loading) return <PageLoader />;
 
