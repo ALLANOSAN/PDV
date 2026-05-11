@@ -90,8 +90,8 @@ function DashboardLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950 transition-colors">
-        <div className="h-full">
+      <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950 transition-colors ml-64">
+        <div className="h-full min-h-screen">
             <Outlet />
         </div>
       </main>
