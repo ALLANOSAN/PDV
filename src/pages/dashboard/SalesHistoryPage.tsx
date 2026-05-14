@@ -3,19 +3,12 @@ import { supabase } from "../../lib/supabase";
 import { validateManagerPassword } from "../../lib/cart-engine";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Sale, SaleItem } from "../../types";
+import { Sale, SaleItem, Product } from "../../types";
 import { X, Calendar, Search, FileDown, RotateCcw } from "lucide-react";
 import { CustomDialog } from "../../components/ui/CustomDialog";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-interface DialogConfig {
-  type: "confirm" | "prompt" | "alert";
-  title: string;
-  message: string;
-  onConfirm: (value?: string) => void;
-  onCancel?: () => void;
-}
+import { DialogConfig } from "../../types/ui";
 
 function SalesHistoryPage() {
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -48,7 +41,7 @@ function SalesHistoryPage() {
       const { data, error } = await query;
       if (error) throw error;
       return data as (Sale & {
-        sale_items: (SaleItem & { products: any })[];
+        sale_items: (SaleItem & { products: Pick<Product, "name"> | null })[];
       })[];
     },
   });
@@ -97,7 +90,6 @@ function SalesHistoryPage() {
           return;
         }
 
-        setDialogConfig(null);
         queryClient.invalidateQueries({ queryKey: ["sales-history"] });
         toast.success("Venda cancelada com sucesso!");
       },
@@ -106,10 +98,10 @@ function SalesHistoryPage() {
   };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
             Essência Cosméticos - Histórico
           </h2>
           <p className="text-slate-500 dark:text-slate-400 font-medium">
@@ -150,23 +142,23 @@ function SalesHistoryPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center p-20 text-slate-400 gap-4">
+        <div className="flex flex-col items-center justify-center p-10 sm:p-20 text-slate-400 gap-4">
           <RotateCcw className="animate-spin" size={32} />
           <span className="font-bold uppercase tracking-widest text-xs text-slate-500">
             Recuperando registros...
           </span>
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
-                  <th className="p-6">Transação ID</th>
-                  <th className="p-6">Conteúdo do Pedido</th>
-                  <th className="p-6">Método</th>
-                  <th className="p-6">Valor Total</th>
-                  <th className="p-6 text-right">Ações</th>
+                  <th className="p-4 sm:p-6">ID</th>
+                  <th className="p-4 sm:p-6">Pedido</th>
+                  <th className="p-4 sm:p-6">Método</th>
+                  <th className="p-4 sm:p-6">Total</th>
+                  <th className="p-4 sm:p-6 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -183,12 +175,12 @@ function SalesHistoryPage() {
                     <tr
                       key={sale.id}
                       className={`group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors ${sale.status === "canceled" ? "opacity-40 grayscale" : ""}`}>
-                      <td className="p-6">
+                      <td className="p-4 sm:p-6">
                         <span className="font-mono text-xs text-slate-400 group-hover:text-indigo-500 transition-colors">
                           #{sale.id.slice(0, 8)}
                         </span>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 sm:p-6">
                         <div className="flex flex-col gap-0.5">
                           <span
                             className={`font-bold text-slate-800 dark:text-slate-100 ${sale.status === "canceled" ? "line-through" : ""}`}>
@@ -207,23 +199,23 @@ function SalesHistoryPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-6 uppercase">
+                      <td className="p-4 sm:p-6 uppercase">
                         <span
                           className={`px-2 py-1 rounded-lg text-[10px] font-black tracking-widest ${sale.payment_method === "cash" ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600"}`}>
                           {sale.payment_method}
                         </span>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 sm:p-6">
                         <span
-                          className={`font-black text-lg ${sale.status === "canceled" ? "text-slate-400" : "text-slate-900 dark:text-white"}`}>
+                          className={`font-black text-base sm:text-lg ${sale.status === "canceled" ? "text-slate-400" : "text-slate-900 dark:text-white"}`}>
                           R$ {sale.total_amount.toFixed(2)}
                         </span>
                       </td>
-                      <td className="p-6 text-right">
+                      <td className="p-4 sm:p-6 text-right">
                         {sale.status !== "canceled" && (
                           <button
                             onClick={() => cancelSale(sale)}
-                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-100 md:opacity-0 group-hover:opacity-100"
                             title="Cancelar Venda">
                             <X size={20} strokeWidth={3} />
                           </button>

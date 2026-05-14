@@ -1,3 +1,11 @@
+/**
+ * DashboardPage
+ * Página principal do painel administrativo.
+ * Responsável por exibir gráficos e estatísticas de vendas, produtos e usuários.
+ *
+ * Sugestão: extrair a lógica de busca/processamento de dados para um hook customizado (ex: useDashboardStats)
+ * para manter o componente mais limpo e facilitar testes.
+ */
 import {
   PieChart,
   Pie,
@@ -74,9 +82,9 @@ export default function DashboardPage() {
     );
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in duration-500">
+    <div className="p-3 sm:p-8 space-y-6 sm:space-y-8 animate-in fade-in duration-500">
       <div>
-        <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+        <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
           Painel de Performance
         </h2>
         <p className="text-slate-500 font-medium">
@@ -84,7 +92,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[
           {
             label: "Faturamento Total",
@@ -113,7 +121,7 @@ export default function DashboardPage() {
         ].map((stat, i) => (
           <div
             key={i}
-            className={`p-6 rounded-[2rem] border-2 border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all shadow-sm ${stat.color}`}>
+            className={`p-5 sm:p-6 rounded-2xl sm:rounded-3xl border-2 border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all shadow-sm ${stat.color}`}>
             <div className="flex justify-between items-start mb-4">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 {stat.label}
@@ -130,7 +138,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-slate-50 dark:border-slate-800 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-slate-50 dark:border-slate-800 shadow-sm">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">
             Faturamento por Dia
           </h3>
@@ -181,7 +189,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-slate-50 dark:border-slate-800 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-slate-50 dark:border-slate-800 shadow-sm">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">
             Métodos de Pagamento
           </h3>

@@ -19,7 +19,7 @@ function PriceCheckPage() {
       }
 
       setIsLoading(true);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("products")
         .select("*")
         .ilike("name", `%${searchTerm}%`)
